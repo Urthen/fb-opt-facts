@@ -1,0 +1,29 @@
+{
+  "name": "fb-opt-facts",
+  "version": "0.0.1",
+  "description": "Fritbot Quotes Module",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Urthen/fb-opt-facts.git"
+  },
+  "dependencies": {
+    "lodash": "",
+    "q": ""
+  },
+  "devDependencies": {
+    "grunt": "",
+    "grunt-push-release": "",
+    "grunt-contrib-jshint": "",
+    "grunt-jscs": ""
+  },
+  "keywords": [
+    "fritbot",
+    "fritbot-module"
+  ],
+  "author": "Michael Pratt",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Urthen/fb-opt-facts/issues"
+  },
+  "homepage": "https://github.com/Urthen/fb-opt-facts"
+}

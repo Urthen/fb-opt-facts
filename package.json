@@ -1,14 +1,13 @@
 {
   "name": "fb-opt-facts",
   "version": "0.0.1",
-  "description": "Fritbot Quotes Module",
+  "description": "Fritbot Facts Module",
   "repository": {
     "type": "git",
     "url": "git://github.com/Urthen/fb-opt-facts.git"
   },
   "dependencies": {
-    "lodash": "",
-    "q": ""
+    "lodash": ""
   },
   "devDependencies": {
     "grunt": "",

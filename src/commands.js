@@ -47,6 +47,38 @@ module.exports = {
 			route.send('Error learning that fact: ' + err);
 		});
 	},
+	say : function (route, message) {
+		
+		var bot = this;
+		var output = message.join(' ');
+
+		console.log('Forced to say fact:', output);
+
+		// Replace who with the triggerer
+		output = output.replace(/\$who/ig, route.nick);
+
+		// Chose random people in the room
+		var someone = /\$someone/i;
+		while (someone.test(output)) {
+			output = output.replace(someone, _.sample(bot.users.getRoomRoster(route.room)).nick);
+		}
+
+		// Some people like using $something instead of $item
+		var something = /(\$something)/i;
+		while (something.test(output)) {
+			output = output.replace(something, bot.db.schemas.word.selectByType('$item'));
+		}
+
+		_.forEach(bot.db.schemas.word.getTypes(), function (type) {
+			// don't forget to add a slash before the $!!
+			var regex = new RegExp('\\' + type, 'i');
+			while (regex.test(output)) {
+				output = output.replace(regex, bot.db.schemas.word.selectByType(type));
+			}
+		});
+
+		route.indirect().send(output);
+	},
 	explain : function (route) {
 		if (last_info) {
 			var out = 'That was "' + last_info.factoid + '", triggered by "' + last_info.match + '"';

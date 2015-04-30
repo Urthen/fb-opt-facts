@@ -13,7 +13,14 @@ module.exports = function (web) {
 		});
 	}));
 
+	app.get('/', web.render(app, 'words', function (req, next) {
+		web.bot.db.schemas.word.find({}).then(function (words) {
+			next({ words : words });
+		});
+	}));
+
 	app.use('/static', web.express.static(__dirname + '/../static/'));
 
 	web.addModuleApp('/facts/', app, 'Facts');
+	web.addModuleApp('/words/', app, 'Words');
 };

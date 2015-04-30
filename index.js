@@ -14,6 +14,12 @@ module.exports = {
             trigger : /learn/i,
             func : commands.learn
         }, {
+            name : 'Say Fact',
+            description : 'Force Fritbot to say a given factoid; useful for testing new facts before teaching them.',
+            usage : 'say factoid',
+            trigger : /say/i,
+            func : commands.say
+        }, {
             name : 'Explain Fact',
             description : 'Explains what fact Fritbot just recited.',
             usage : 'what was that',

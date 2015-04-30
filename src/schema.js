@@ -159,7 +159,7 @@ module.exports = function (bot) {
 	// Create word model
 	bot.db.schemas.word = bot.db.mongoose.model('Word', wordSchema);
 
-	// Load all existing triggers
+	// Load all existing words
 	bot.db.schemas.word.find({}, function (err, words) {
 		for (var i = 0; i < words.length; i++) {
 			var word = words[i];

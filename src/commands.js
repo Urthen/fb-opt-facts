@@ -3,6 +3,34 @@ var _ = require('lodash');
 var last_info = [];
 var rate_limit = {};
 
+function replaceFactoidArgs (factoid, triggered, bot, route) {
+	// Replace who and what with the triggerer and the match
+	factoid = factoid.replace(/\$who/ig, route.nick);
+	if (triggered) factoid = factoid.replace(/\$what/ig, triggered.match[1]);
+
+	// Chose random people in the room
+	var someone = /\$someone/i;
+	while (someone.test(factoid)) {
+		factoid = factoid.replace(someone, _.sample(bot.users.getRoomRoster(route.room)).nick);
+	}
+
+	// Some people like using $something instead of $item
+	var something = /(\$something)/i;
+	while (something.test(factoid)) {
+		factoid = factoid.replace(something, bot.db.schemas.word.selectByType('$item'));
+	}
+
+	_.forEach(bot.db.schemas.word.getTypes(), function (type) {
+		// don't forget to add a slash before the $!!
+		var regex = new RegExp('\\' + type, 'i');
+		while (regex.test(factoid)) {
+			factoid = factoid.replace(regex, bot.db.schemas.word.selectByType(type));
+		}
+	});
+
+	return factoid;
+}
+
 module.exports = {
 	learn : function (route, args) {
 		var trigger = args.shift();
@@ -46,6 +74,17 @@ module.exports = {
 			console.log('Error learning fact:', err);
 			route.send('Error learning that fact: ' + err);
 		});
+	},
+	say : function (route, message) {
+		
+		var bot = this;
+		var output = message.join(' ');
+
+		console.log('Forced to say fact:', output);
+
+		output = replaceFactoidArgs(output, false, bot, route);
+
+		route.indirect().send(output);
 	},
 	explain : function (route) {
 		if (last_info) {
@@ -100,29 +139,7 @@ module.exports = {
 					match : triggered.match[0]
 				};
 
-				// Replace who and what with the triggerer and the match
-				output = output.replace(/\$who/ig, route.nick);
-				output = output.replace(/\$what/ig, triggered.match[1]);
-
-				// Chose random people in the room
-				var someone = /\$someone/i;
-				while (someone.test(output)) {
-					output = output.replace(someone, _.sample(bot.users.getRoomRoster(route.room)).nick);
-				}
-
-				// Some people like using $something instead of $item
-				var something = /(\$something)/i;
-				while (something.test(output)) {
-					output = output.replace(something, bot.db.schemas.word.selectByType('$item'));
-				}
-
-				_.forEach(bot.db.schemas.word.getTypes(), function (type) {
-					// don't forget to add a slash before the $!!
-					var regex = new RegExp('\\' + type, 'i');
-					while (regex.test(output)) {
-						output = output.replace(regex, bot.db.schemas.word.selectByType(type));
-					}
-				});
+				output = replaceFactoidArgs(output, triggered, bot, route);
 
 				route.indirect().send(output);
 			}, function (err) {

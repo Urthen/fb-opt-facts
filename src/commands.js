@@ -3,7 +3,7 @@ var _ = require('lodash');
 var last_info = [];
 var rate_limit = {};
 
-function replaceFactoidArgs (factoid, triggered, bot, route) {
+function replaceFactoidPlaceholders (factoid, triggered, bot, route) {
 	// Replace who and what with the triggerer and the match
 	factoid = factoid.replace(/\$who/ig, route.nick);
 	if (triggered) factoid = factoid.replace(/\$what/ig, triggered.match[1]);
@@ -20,6 +20,7 @@ function replaceFactoidArgs (factoid, triggered, bot, route) {
 		factoid = factoid.replace(something, bot.db.schemas.word.selectByType('$item'));
 	}
 
+	// Resolve remaining $placeholders
 	_.forEach(bot.db.schemas.word.getTypes(), function (type) {
 		// don't forget to add a slash before the $!!
 		var regex = new RegExp('\\' + type, 'i');
@@ -82,7 +83,7 @@ module.exports = {
 
 		console.log('Forced to say fact:', output);
 
-		output = replaceFactoidArgs(output, false, bot, route);
+		output = replaceFactoidPlaceholders(output, false, bot, route);
 
 		route.indirect().send(output);
 	},
@@ -139,7 +140,7 @@ module.exports = {
 					match : triggered.match[0]
 				};
 
-				output = replaceFactoidArgs(output, triggered, bot, route);
+				output = replaceFactoidPlaceholders(output, triggered, bot, route);
 
 				route.indirect().send(output);
 			}, function (err) {

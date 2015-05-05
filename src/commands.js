@@ -1,6 +1,6 @@
 var _ = require('lodash');
 
-var last_info = [];
+var last_info = {};
 var rate_limit = {};
 
 function replaceFactoidPlaceholders (factoid, triggered, bot, route) {
@@ -88,13 +88,14 @@ module.exports = {
 		route.indirect().send(output);
 	},
 	explain : function (route) {
-		if (last_info) {
-			var out = 'That was "' + last_info.factoid + '", triggered by "' + last_info.match + '"';
-			if (last_info.trigger !== '\\b' + last_info.match + '\\b') {
-				out += ' matching "' + last_info.trigger + '"';
+		var channel = last_info[route.room] ? route.room : route.user._id.toString();
+		if (last_info[channel]) {
+			var out = 'That was "' + last_info[channel].factoid + '", triggered by "' + last_info[channel].match + '"';
+			if (last_info[channel].trigger !== '\\b' + last_info[channel].match + '\\b') {
+				out += ' matching "' + last_info[channel].trigger + '"';
 			}
-			if (last_info.author) {
-				out += ', authored by ' + last_info.author;
+			if (last_info[channel].author) {
+				out += ', authored by ' + last_info[channel].author;
 			}
 			route.send(out);
 		} else {
@@ -133,12 +134,18 @@ module.exports = {
 				console.log('Triggered raw fact:', output);
 
 				// Save info about last triggered fact
-				last_info = {
+				var last_info_obj = {
 					factoid : factoid.factoid,
 					author : factoid.author,
 					trigger : triggered.trigger.trigger, //oh yes
 					match : triggered.match[0]
 				};
+
+				if (route.room) {
+					last_info[route.room] = last_info_obj;
+				} else {
+					last_info[route.user._id.toString()] = last_info_obj;
+				}
 
 				output = replaceFactoidPlaceholders(output, triggered, bot, route);
 

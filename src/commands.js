@@ -110,7 +110,7 @@ module.exports = {
 		}
 
 		var bot = this;
-		var triggered =  this.db.schemas.factTrigger.checkMessage(message);
+		var triggered = this.db.schemas.factTrigger.checkMessage(message);
 
 		if (triggered) {
 			// Set rate limit in room

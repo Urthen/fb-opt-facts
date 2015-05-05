@@ -6,15 +6,31 @@ $(document).ready(function () {
             $(this).html( '<input type="text" class="form-control" placeholder="Search ' + title + '" />' );
         }
     } );
+
+    // Set all cell heights to value of largest cell height
+    var maxCellHeight = Math.max.apply(null, $("#maintable td").map(function () {
+        return $(this).outerHeight();
+    }).get());
+    $("<style>#maintable td { height: " + maxCellHeight.toString() + "px; }</style>" ).appendTo("head");
+
     var table = $('#maintable').DataTable({
         processing : true,
-        dom : 'lrtip',
+        dom : 'rtiS',
+        deferRender: true,
+        scrollY: "500px",
+        stateSave: true,
         columns : [
-            null,
-            null,
             {
+                width : '20%'
+            },
+            {
+                width : 'auto'
+            },
+            {
+                className : 'text-right',
                 orderable : false,
-                searchable : false
+                searchable : false,
+                width : '30px'
             }
         ]
     });
@@ -28,10 +44,28 @@ $(document).ready(function () {
         } );
     } );
 
-    var r = $('#maintable tfoot tr');
-    r.find('th').each(function () {
-        $(this).css('padding', 8);
-    });
-    $('#maintable thead').append(r);
+    var r = $('.dataTables_scrollFoot tfoot');
+    $('.dataTables_scrollHead table').append(r);
     $('#search_0').css('text-align', 'center');
+
+    function resizeDataTable () {
+        var windowHeight = $(window).height();
+        var tableBodyOffset = $('.dataTables_scrollBody').offset().top;
+        var tableInfoHeight = $('.dataTables_info').outerHeight();
+        var footerHeight = $('.navbar-fixed-bottom').outerHeight();
+        $('.dataTables_scrollBody').css('height', (windowHeight - tableBodyOffset - (tableInfoHeight * 2) - footerHeight));
+    }
+
+    resizeDataTable();
+
+    $(window).resize(function() {
+        resizeDataTable();
+    });
+
+    // Force a manual window.resize event; DataTables Scroller plugin won't read proper row heights if we don't
+    // Delay the event so that the table and all styling has been applied
+    setTimeout(function () {
+        $(window).trigger('resize');
+    }, 500);
+
 });

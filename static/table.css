@@ -2,3 +2,6 @@
     margin: 4px 0 0 0;
 }
 
+.dataTables_scrollBody {
+    border-top: 2px solid #ddd;
+}

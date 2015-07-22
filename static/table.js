@@ -9,7 +9,7 @@ $(document).ready(function () {
 
     // Set all cell heights to value of largest cell height
     var maxCellHeight = Math.max.apply(null, $("#maintable td").map(function () {
-        return $(this).outerHeight();
+        return $(this).height();
     }).get());
     $("<style>#maintable td { height: " + maxCellHeight.toString() + "px; }</style>" ).appendTo("head");
 
@@ -30,7 +30,7 @@ $(document).ready(function () {
                 className : 'text-right',
                 orderable : false,
                 searchable : false,
-                width : '30px'
+                width : '60px'
             }
         ]
     });

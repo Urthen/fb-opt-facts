@@ -32,9 +32,9 @@ link(rel='stylesheet', href='#{module_root}/static/table.css')
                         tr
                             td= word.type.slice(1)
                             td= word.word
-                            td
+                            td.controls
                                 a(href="#")
-                                    span.glyphicon.glyphicon-pencil.text-success
+                                    span.glyphicon.glyphicon-pencil.text-warning
                                 |  
                                 a(href="#")
-                                    span.glyphicon.glyphicon-remove
+                                    span.glyphicon.glyphicon-remove.text-danger

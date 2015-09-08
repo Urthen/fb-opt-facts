@@ -38,6 +38,11 @@ module.exports = {
 		var alias = false;
 		var rex_trigger;
 
+		if (!trigger) {
+			route.send('?facts_trigger_missing');
+			return;
+		}
+
 		if (trigger === 'alias') {
 			alias = true;
 			trigger = args.shift();
@@ -45,15 +50,15 @@ module.exports = {
 
 		// Reject short triggers, add word boundaries to non-regex triggers.
 		if (trigger[0] === '/') {
-			if (trigger.length < 6) {
-				route.send('Triggers must be longer than that!');
+			if (trigger.length < 5) {
+				route.send('?facts_trigger_short');
 				return;
 			}
 
 			rex_trigger = trigger.replace(/\//g, '');
 		} else {
-			if (trigger.length < 4) {
-				route.send('Triggers must be longer than that!');
+			if (trigger.length < 3) {
+				route.send('?facts_trigger_short');
 				return;
 			}
 			rex_trigger =  '\\b' + trigger + '\\b';
@@ -70,10 +75,10 @@ module.exports = {
 
 		// Respond to user
 		promise.then(function () {
-			route.send('Learned "' + trigger + '" -> "' + remainder + '"');
+			route.send('?facts_learned_fact', trigger, remainder);
 		}, function (err) {
 			console.log('Error learning fact:', err);
-			route.send('Error learning that fact: ' + err);
+			route.send('?response_error', err);
 		});
 	},
 	say : function (route, message) {

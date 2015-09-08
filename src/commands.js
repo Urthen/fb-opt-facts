@@ -1,9 +1,9 @@
 var _ = require('lodash');
 
-var last_info = [];
+var last_info = {};
 var rate_limit = {};
 
-function replaceFactoidArgs (factoid, triggered, bot, route) {
+function replaceFactoidPlaceholders (factoid, triggered, bot, route) {
 	// Replace who and what with the triggerer and the match
 	factoid = factoid.replace(/\$who/ig, route.nick);
 	if (triggered) factoid = factoid.replace(/\$what/ig, triggered.match[1]);
@@ -20,6 +20,7 @@ function replaceFactoidArgs (factoid, triggered, bot, route) {
 		factoid = factoid.replace(something, bot.db.schemas.word.selectByType('$item'));
 	}
 
+	// Resolve remaining $placeholders
 	_.forEach(bot.db.schemas.word.getTypes(), function (type) {
 		// don't forget to add a slash before the $!!
 		var regex = new RegExp('\\' + type, 'i');
@@ -82,18 +83,19 @@ module.exports = {
 
 		console.log('Forced to say fact:', output);
 
-		output = replaceFactoidArgs(output, false, bot, route);
+		output = replaceFactoidPlaceholders(output, false, bot, route);
 
 		route.indirect().send(output);
 	},
 	explain : function (route) {
-		if (last_info) {
-			var out = 'That was "' + last_info.factoid + '", triggered by "' + last_info.match + '"';
-			if (last_info.trigger !== '\\b' + last_info.match + '\\b') {
-				out += ' matching "' + last_info.trigger + '"';
+		var channel = last_info[route.room] ? route.room : route.user._id.toString();
+		if (last_info[channel]) {
+			var out = 'That was "' + last_info[channel].factoid + '", triggered by "' + last_info[channel].match + '"';
+			if (last_info[channel].trigger !== '\\b' + last_info[channel].match + '\\b') {
+				out += ' matching "' + last_info[channel].trigger + '"';
 			}
-			if (last_info.author) {
-				out += ', authored by ' + last_info.author;
+			if (last_info[channel].author) {
+				out += ', authored by ' + last_info[channel].author;
 			}
 			route.send(out);
 		} else {
@@ -109,7 +111,7 @@ module.exports = {
 		}
 
 		var bot = this;
-		var triggered =  this.db.schemas.factTrigger.checkMessage(message);
+		var triggered = this.db.schemas.factTrigger.checkMessage(message);
 
 		if (triggered) {
 			// Set rate limit in room
@@ -132,14 +134,20 @@ module.exports = {
 				console.log('Triggered raw fact:', output);
 
 				// Save info about last triggered fact
-				last_info = {
+				var last_info_obj = {
 					factoid : factoid.factoid,
 					author : factoid.author,
 					trigger : triggered.trigger.trigger, //oh yes
 					match : triggered.match[0]
 				};
 
-				output = replaceFactoidArgs(output, triggered, bot, route);
+				if (route.room) {
+					last_info[route.room] = last_info_obj;
+				} else {
+					last_info[route.user._id.toString()] = last_info_obj;
+				}
+
+				output = replaceFactoidPlaceholders(output, triggered, bot, route);
 
 				route.indirect().send(output);
 			}, function (err) {

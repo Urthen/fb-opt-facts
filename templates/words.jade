@@ -33,8 +33,9 @@ link(rel='stylesheet', href='#{module_root}/static/table.css')
                             td= word.type.slice(1)
                             td= word.word
                             td.controls
-                                a(href="#")
-                                    span.glyphicon.glyphicon-pencil.text-warning
-                                |  
-                                a(href="#")
-                                    span.glyphicon.glyphicon-remove.text-danger
+                                if admin
+                                    a(href="#")
+                                        span.glyphicon.glyphicon-pencil.text-warning
+                                    |  
+                                    a(href="remove?id=#{fact.id}")
+                                        span.glyphicon.glyphicon-remove.text-danger

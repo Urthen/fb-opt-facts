@@ -9,23 +9,31 @@ module.exports = function (web) {
 
 	app.get('/', web.render(app, 'facts', function (req, next) {
 		web.bot.db.schemas.factFactoid.find({}).populate('trigger').execQ().then(function (facts) {
-			next({ facts : facts, admin : req.query.admin });
+			next({ facts : facts });
 		}).done();
 	}));
 
 	app.get('/words', web.render(app, 'words', function (req, next) {
 		web.bot.db.schemas.word.find({}).then(function (words) {
-			next({ words : words, admin : req.query.admin });
+			next({ words : words });
 		}).done();
 	}));
 
-	app.get('/remove', function (req, res) {
-
+	function sanityCheck (req, res, next) {
 		if (!req.query.id) {
 			web.error(res, 'Needs ID', "Don't mess around with things you don't understand.");
 			return;
 		}
 
+		if (!(req.session && req.session.user && req.session.user.admin)) {
+			web.error(res, 'Unauthorized', 'You are not an admin.');
+			return;
+		}
+
+		next();
+	}
+
+	app.get('/remove', sanityCheck, function (req, res) {
 		var id = req.query.id;
 		console.log('Deleting fact:', id);
 
@@ -35,13 +43,7 @@ module.exports = function (web) {
 		}).done();
 	});
 
-	app.get('/remove/words', function (req, res) {
-
-		if (!req.query.id) {
-			web.error(res, 'Needs ID', "Don't mess around with things you don't understand.");
-			return;
-		}
-
+	app.get('/words/remove', sanityCheck, function (req, res) {
 		var id = req.query.id;
 		console.log('Deleting word:', id);
 
@@ -51,9 +53,7 @@ module.exports = function (web) {
 		}).done();
 	});
 
-	app.locals = {
-		module_root : '/modules/facts'
-	};
+	app.locals.module_root = '/modules/facts';
 
 	app.use('/static', web.express.static(__dirname + '/../static/'));
 

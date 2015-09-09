@@ -33,7 +33,7 @@ link(rel='stylesheet', href='#{module_root}/static/table.css')
                             td= fact.trigger.trigger
                             td= fact.factoid
                             td.controls
-                                if admin
+                                if user && user.admin
                                     a(href="#")
                                         span.glyphicon.glyphicon-pencil.text-warning
                                     |  

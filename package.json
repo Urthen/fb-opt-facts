@@ -1,10 +1,10 @@
 {
   "name": "fb-opt-facts",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Fritbot Facts Module",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Urthen/fb-opt-facts.git"
+    "url": "git://github.com/fritbot/fb-opt-facts.git"
   },
   "dependencies": {
     "lodash": "",
@@ -23,7 +23,7 @@
   "author": "Michael Pratt",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Urthen/fb-opt-facts/issues"
+    "url": "https://github.com/fritbot/fb-opt-facts/issues"
   },
-  "homepage": "https://github.com/Urthen/fb-opt-facts"
+  "homepage": "https://github.com/fritbot/fb-opt-facts"
 }
